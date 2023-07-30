@@ -1,8 +1,24 @@
 const express = require("express");
-
-const client = require("./connection");
 const app = express();
 
-app.listen(3100, () => {
-  console.log("Server running in port 3100");
+require("dotenv").config();
+
+const client = require("./connection");
+
+app.listen(process.env.DB_PORT, () => {
+  console.log("Server is running");
 });
+
+client.connect((err) => {
+  if (err) {
+    console.log(err.message);
+  } else {
+    console.log("Connected");
+  }
+});
+
+console.log(process.env.DB_HOST);
+console.log(process.env.DB_USER);
+console.log(process.env.DB_PASSWORD);
+console.log(process.env.DB_PORT);
+console.log(process.env.DATABASE);
