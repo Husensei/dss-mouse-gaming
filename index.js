@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 
-const { getAllCriteria } = require("./criteria/criteria");
 const client = require("./connection");
 
 app.use(express.urlencoded({ extended: false }));
@@ -14,8 +13,8 @@ process.on("uncaughtException", function (err) {
   console.log(err);
 });
 
-app.listen(3100, () => {
-  console.log("Server is listening on port");
+app.listen(process.env.PORT, () => {
+  console.log(`Server is listening on port ${process.env.PORT}`);
 });
 
 client.connect((err) => {
@@ -26,12 +25,11 @@ client.connect((err) => {
   }
 });
 
-// app.get("/criteria", async (_, res) => {
-//   try {
-//     return getAllCriteria().then((result) => res.json(result));
-//   } catch (error) {}
-// });
+app.get("/", (_, res) => {
+  res.send("Hello, World!");
+});
 
+// Get mouse criteria
 app.get("/criteria", (req, res) => {
   client.query(`SELECT * FROM criteria`, (err, result) => {
     if (!err) {
@@ -40,44 +38,42 @@ app.get("/criteria", (req, res) => {
   });
 });
 
+// Add mouse alternative
+app.post("/alternative", (req, res) => {
+  const { name, shape, connectivity, grip, weight, sensor, price } = req.body;
+  client.query(`INSERT INTO alternative (name, shape, connectivity, grip, weight, sensor, price) VALUES ('${name}', '${shape}', '${connectivity}', '${grip}', ${weight}, '${sensor}', '${price}')`, (err, result) => {
+    if (!err) {
+      res.send({ message: "Insert Success" });
+    } else {
+      res.send(err.message);
+    }
+  });
+});
+
+// Get all mouse alternative
 app.get("/alternative", (req, res) => {
-  client.query(`SELECT * FROM mouse_alternative`, (err, result) => {
+  client.query(`SELECT * FROM alternative`, (err, result) => {
     if (!err) {
       res.send(result.rows);
     }
   });
 });
 
-app.post("/alternative", (req, res) => {
-  const { name, shape, connectivity, grip, weight, sensor, price } = req.body;
-  client.query(
-    `INSERT INTO mouse_alternative (mouse_name, mouse_shape, mouse_connectivity, mouse_grip, mouse_weight, mouse_sensor, mouse_price) VALUES ('${name}', '${shape}', '${connectivity}', '${grip}', ${weight}, '${sensor}', '${price}')`,
-    (err, result) => {
-      if (!err) {
-        res.send({ message: "Insert Success" });
-      } else {
-        res.send(err.message);
-      }
-    }
-  );
-});
-
+// Edit mouse specification
 app.put("/alternative/:id", (req, res) => {
   const { name, shape, connectivity, grip, weight, sensor, price } = req.body;
-  client.query(
-    `UPDATE mouse_alternative SET mouse_name = '${name}', mouse_shape = '${shape}', mouse_connectivity = '${connectivity}', mouse_grip = '${grip}', mouse_weight = ${weight}, mouse_sensor = '${sensor}', mouse_price = '${price}' WHERE mouse_id = '${req.params.id}'`,
-    (err, result) => {
-      if (!err) {
-        res.send({ message: "Update Success" });
-      } else {
-        res.send(err.message);
-      }
+  client.query(`UPDATE alternative SET name = '${name}', shape = '${shape}', connectivity = '${connectivity}', grip = '${grip}', weight = ${weight}, sensor = '${sensor}', price = '${price}' WHERE id = '${req.params.id}'`, (err, result) => {
+    if (!err) {
+      res.send({ message: "Update Success" });
+    } else {
+      res.send(err.message);
     }
-  );
+  });
 });
 
+// Delete mouse alternative
 app.delete("/alternative/:id", (req, res) => {
-  client.query(`DELETE FROM mouse_alternative WHERE mouse_id = '${req.params.id}'`, (err, result) => {
+  client.query(`DELETE FROM alternative WHERE id = '${req.params.id}'`, (err, result) => {
     if (!err) {
       res.send({ message: "Delete Success" });
     } else {
