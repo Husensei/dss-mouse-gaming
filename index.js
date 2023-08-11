@@ -34,7 +34,9 @@ app.get("/", (_, res) => {
 // Get mouse criteria
 app.get("/criteria", (req, res) => {
   try {
-    return getCriteria().then((result) => res.json(result));
+    return getCriteria()
+      .then((result) => res.json(result))
+      .catch((error) => res.json(error));
   } catch (error) {
     return res.status(500).json(error.message);
   }
