@@ -61,9 +61,9 @@ app.get("/alternative", (req, res) => {
 });
 
 //Edit mouse detail
-app.put("/alternative/:id", (req, res) => {
+app.patch("/alternative", (req, res) => {
   try {
-    return updateAlternative(req.params, req.body)
+    return updateAlternative(req.body)
       .then((result) => res.json(result))
       .catch((error) => res.json(error));
   } catch (error) {

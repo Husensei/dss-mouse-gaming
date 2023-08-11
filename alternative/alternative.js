@@ -17,11 +17,10 @@ const getAlternative = async () => {
   });
 };
 
-const updateAlternative = async (params, data) => {
+const updateAlternative = async (data) => {
   return new Promise(async (resolve, reject) => {
-    const id = params.id;
     client.query(
-      `UPDATE alternative SET name = '${data.name}', shape = '${data.shape}', connectivity = '${data.connectivity}', grip = '${data.grip}', weight = ${data.weight}, sensor = '${data.sensor}', price = '${data.price}' WHERE id = '${id}'`,
+      `UPDATE alternative SET name = '${data.name}', shape = '${data.shape}', connectivity = '${data.connectivity}', grip = '${data.grip}', weight = ${data.weight}, sensor = '${data.sensor}', price = '${data.price}' WHERE id = '${data.id}'`,
       (err, result) => {
         if (err) reject(err.message);
         resolve({ status: 202, message: "Update success" });
