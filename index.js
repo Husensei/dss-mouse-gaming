@@ -4,8 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const client = require("./connection");
-const { getCriteria } = require("./criteria/criteria");
+const { getCriteria, calculateWeight, getLambdaMax, getCI, getCR } = require("./criteria/criteria");
 const { addAlternative, getAlternative, updateAlternative, deleteAlternative } = require("./alternative/alternative");
+const { getMatrix, insertMatrix, getPreference, insertPreference } = require("./preference/preference");
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -32,11 +33,45 @@ app.get("/", (_, res) => {
 });
 
 // Get mouse criteria
-app.get("/criteria", (req, res) => {
+app.get("/criteria", (_, res) => {
   try {
-    return getCriteria()
-      .then((result) => res.json(result))
-      .catch((error) => res.json(error));
+    return getCriteria().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+// Get criteria weight
+app.get("/criteria/ahp", (_, res) => {
+  try {
+    return calculateWeight().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+// Get lambda max value
+app.get("/criteria/lambdamax", (_, res) => {
+  try {
+    return getLambdaMax().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+// Get CI value
+app.get("/criteria/ci", (_, res) => {
+  try {
+    return getCI().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+// Get CR value
+app.get("/criteria/cr", (_, res) => {
+  try {
+    return getCR().then((result) => res.json(result));
   } catch (error) {
     return res.status(500).json(error.message);
   }
@@ -52,7 +87,7 @@ app.post("/alternative", (req, res) => {
 });
 
 // Get mouse alternative
-app.get("/alternative", (req, res) => {
+app.get("/alternative", (_, res) => {
   try {
     return getAlternative().then((result) => res.json(result));
   } catch (error) {
@@ -60,23 +95,51 @@ app.get("/alternative", (req, res) => {
   }
 });
 
-//Edit mouse detail
+//Edit mouse alternative
 app.patch("/alternative", (req, res) => {
   try {
-    return updateAlternative(req.body)
-      .then((result) => res.json(result))
-      .catch((error) => res.json(error));
+    return updateAlternative(req.body).then((result) => res.json(result));
   } catch (error) {
     return res.status(500).json(error.message);
   }
 });
 
-// Delete Alternative
+// Delete mouse alternative
 app.delete("/alternative/:id", (req, res) => {
   try {
-    return deleteAlternative(req.params)
-      .then((result) => res.json(result))
-      .catch((error) => res.json(error));
+    return deleteAlternative(req.params).then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+app.get("/matrix", (_, res) => {
+  try {
+    return getMatrix().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+app.post("/matrix", (req, res) => {
+  try {
+    return insertMatrix(req.body).then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+app.get("/preference", (_, res) => {
+  try {
+    return getPreference().then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+app.post("/preference", (req, res) => {
+  try {
+    return insertPreference(req.body).then((result) => res.json(result));
   } catch (error) {
     return res.status(500).json(error.message);
   }
