@@ -163,10 +163,21 @@ const selectedAlternative = async (data) => {
   });
 };
 
+const getRecommendation = async () => {
+  return new Promise(async (resolve, reject) => {
+    client.query(`SELECT * FROM recommendation ORDER BY rating DESC`, (err, result) => {
+      if (err) reject(err.message);
+      if (!result) reject({ status: 404, message: "Data not found" });
+      resolve(result.rows);
+    });
+  });
+};
+
 module.exports = {
   addAlternative,
   getAlternative,
   updateAlternative,
   deleteAlternative,
   selectedAlternative,
+  getRecommendation,
 };

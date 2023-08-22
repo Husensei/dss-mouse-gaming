@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const client = require("./connection");
 const { getCriteria, calculateWeight, getLambdaMax, getCI, getCR } = require("./criteria/criteria");
-const { addAlternative, getAlternative, updateAlternative, deleteAlternative, selectedAlternative } = require("./alternative/alternative");
+const { addAlternative, getAlternative, updateAlternative, deleteAlternative, selectedAlternative, getRecommendation } = require("./alternative/alternative");
 const { getMatrix, insertMatrix, getPreference, insertPreference } = require("./preference/preference");
 
 app.use(express.urlencoded({ extended: false }));
@@ -148,6 +148,14 @@ app.post("/preference", (req, res) => {
 app.post("/recommendation", (req, res) => {
   try {
     return selectedAlternative(req.body).then((result) => res.json(result));
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+app.get("/recommendation", (_, res) => {
+  try {
+    return getRecommendation().then((result) => res.json(result));
   } catch (error) {
     return res.status(500).json(error.message);
   }
