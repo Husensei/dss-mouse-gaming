@@ -10,7 +10,7 @@ const addAlternative = async (data) => {
 
 const getAlternative = async () => {
   return new Promise(async (resolve, reject) => {
-    client.query(`SELECT * FROM alternative`, (err, result) => {
+    client.query(`SELECT * FROM alternative ORDER BY name`, (err, result) => {
       if (err) reject(err.message);
       if (!result) reject({ status: 404, message: "Data not found" });
       resolve(result.rows);
@@ -160,6 +160,8 @@ const selectedAlternative = async (data) => {
     for (const query of queries) {
       client.query(query);
     }
+
+    resolve({ status: 201, message: "Insert Success" });
   });
 };
 
