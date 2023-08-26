@@ -12,7 +12,7 @@ const getAlternative = async () => {
   return new Promise(async (resolve, reject) => {
     client.query(`SELECT * FROM alternative ORDER BY name`, (err, result) => {
       if (err) reject(err.message);
-      if (!result) reject({ status: 404, message: "Data not found" });
+      if (!result.rows) reject({ status: 404, message: "Data not found" });
       resolve(result.rows);
     });
   });
