@@ -6,9 +6,15 @@ const getCriteria = async () => {
       `SELECT * FROM criteria 
       ORDER BY id`,
       (err, result) => {
-        if (err) reject(err.message);
-        if (!result.rows) reject({ status: 404, message: "Data not found" });
-        resolve(result.rows);
+        if (err) {
+          reject(err.message);
+        } else {
+          if (!result || !result.rows || result.rows.length === 0) {
+            reject({ status: 404, message: "Data not found" });
+          } else {
+            resolve(result.rows);
+          }
+        }
       }
     );
   });
