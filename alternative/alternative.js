@@ -1,27 +1,39 @@
-const { query } = require("express");
 const client = require("../connection");
 
 const addAlternative = async (data) => {
   return new Promise(async (resolve, reject) => {
-    client.query(`INSERT INTO alternative (name, shape, connectivity, grip, weight, sensor, price) VALUES ('${data.name}', '${data.shape}', '${data.connectivity}', '${data.grip}', ${data.weight}, '${data.sensor}', '${data.price}')`);
+    client.query(
+      `INSERT INTO alternative (name, shape, connectivity, 
+        grip, weight, sensor, price) VALUES ('${data.name}', 
+        '${data.shape}', '${data.connectivity}', '${data.grip}', 
+        ${data.weight}, '${data.sensor}', '${data.price}')`
+    );
     resolve({ status: 201, message: "Insert success" });
   });
 };
 
 const getAlternative = async () => {
   return new Promise(async (resolve, reject) => {
-    client.query(`SELECT * FROM alternative ORDER BY name`, (err, result) => {
-      if (err) reject(err.message);
-      if (!result.rows) reject({ status: 404, message: "Data not found" });
-      resolve(result.rows);
-    });
+    client.query(
+      `SELECT * FROM alternative 
+    ORDER BY name`,
+      (err, result) => {
+        if (err) reject(err.message);
+        if (!result.rows) reject({ status: 404, message: "Data not found" });
+        resolve(result.rows);
+      }
+    );
   });
 };
 
 const updateAlternative = async (data) => {
   return new Promise(async (resolve, reject) => {
     client.query(
-      `UPDATE alternative SET name = '${data.name}', shape = '${data.shape}', connectivity = '${data.connectivity}', grip = '${data.grip}', weight = ${data.weight}, sensor = '${data.sensor}', price = '${data.price}' WHERE id = '${data.id}'`,
+      `UPDATE alternative SET name = '${data.name}', 
+      shape = '${data.shape}', connectivity = 
+      '${data.connectivity}', grip = '${data.grip}', 
+      weight = ${data.weight}, sensor = '${data.sensor}', 
+      price = '${data.price}' WHERE id = '${data.id}'`,
       (err, result) => {
         if (err) reject(err.message);
         resolve({ status: 202, message: "Update success" });
@@ -32,7 +44,10 @@ const updateAlternative = async (data) => {
 
 const deleteAlternative = async (data) => {
   return new Promise(async (resolve, reject) => {
-    var q = await client.query(`DELETE FROM alternative WHERE id = '${data.id}'`);
+    var q = await client.query(
+      `DELETE FROM alternative 
+      WHERE id = '${data.id}'`
+    );
     if (q.rowCount == 0) reject({ status: 404, message: "Data not found" });
     resolve({ status: 202, message: "Delete success" });
   });
@@ -49,11 +64,16 @@ function getWeightByName(name, table) {
 
 const selectedAlternative = async (data) => {
   return new Promise(async (resolve, reject) => {
-    const reset = await client.query(`DELETE FROM recommendation WHERE EXISTS (SELECT 1 FROM recommendation);`);
+    const reset = await client.query(
+      `DELETE FROM recommendation 
+    WHERE EXISTS (SELECT 1 FROM recommendation);`
+    );
     const userPreference = await client.query(`SELECT * FROM preference`);
-    const criteriaWeight = await client.query(`SELECT c.name, cw.weight
+    const criteriaWeight = await client.query(
+      `SELECT c.name, cw.weight
     FROM criteria_weight cw
-    JOIN criteria c ON cw.id_criteria = c.id;`);
+    JOIN criteria c ON cw.id_criteria = c.id;`
+    );
 
     const shapeWeight = getWeightByName("Shape", criteriaWeight);
     const connectivityWeight = getWeightByName("Connectivity", criteriaWeight);
@@ -93,7 +113,12 @@ const selectedAlternative = async (data) => {
     const minWeight = Math.min(...weightValues);
 
     const sensorArray = convertedData.map((item) => item.sensor);
-    const sensorValues = await client.query(`SELECT * FROM sensor_rating WHERE sensor_name IN (${sensorArray.map((_, i) => `$${i + 1}`).join(", ")})`, sensorArray);
+    const sensorValues = await client.query(
+      `SELECT * FROM sensor_rating 
+    WHERE sensor_name IN 
+    (${sensorArray.map((_, i) => `$${i + 1}`).join(", ")})`,
+      sensorArray
+    );
 
     const minMaxSensor = {
       cpi: { min: Number.MAX_VALUE, max: Number.MIN_VALUE },
@@ -153,7 +178,13 @@ const selectedAlternative = async (data) => {
         interpolatedData[i].price * priceWeight;
 
       queries.push(
-        `INSERT INTO recommendation(id_alternative, name, shape, connectivity, grip, weight, sensor, price, rating) VALUES ('${interpolatedData[i].id}', '${interpolatedData[i].name}', ${interpolatedData[i].shape}, ${interpolatedData[i].connectivity}, ${interpolatedData[i].grip}, ${interpolatedData[i].weight}, ${interpolatedData[i].sensor}, ${interpolatedData[i].price}, ${finalScore})`
+        `INSERT INTO recommendation(id_alternative, name, shape, 
+        connectivity, grip, weight, sensor, price, rating) 
+        VALUES ('${interpolatedData[i].id}', '${interpolatedData[i].name}', 
+        ${interpolatedData[i].shape}, ${interpolatedData[i].connectivity}, 
+        ${interpolatedData[i].grip}, ${interpolatedData[i].weight}, 
+        ${interpolatedData[i].sensor}, ${interpolatedData[i].price}, 
+        ${finalScore})`
       );
     }
 
