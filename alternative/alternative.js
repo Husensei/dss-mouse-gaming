@@ -114,8 +114,7 @@ const selectedAlternative = async (data) => {
 
     const sensorArray = convertedData.map((item) => item.sensor);
     const sensorValues = await client.query(
-      `SELECT * FROM sensor_rating 
-    WHERE sensor_name IN 
+      `SELECT * FROM sensor_rating WHERE sensor_name IN 
     (${sensorArray.map((_, i) => `$${i + 1}`).join(", ")})`,
       sensorArray
     );
@@ -198,7 +197,17 @@ const selectedAlternative = async (data) => {
 
 const getRecommendation = async () => {
   return new Promise(async (resolve, reject) => {
-    client.query(`SELECT * FROM recommendation ORDER BY rating DESC`, (err, result) => {
+    client.query(`SELECT * FROM recommendation`, (err, result) => {
+      if (err) reject(err.message);
+      if (!result) reject({ status: 404, message: "Data not found" });
+      resolve(result.rows);
+    });
+  });
+};
+
+const getRank = async () => {
+  return new Promise((resolve, reject) => {
+    client.query(`SELECT a.name, a.shape, a.connectivity, a.grip, a.weight, a.sensor, a.price, r.rating FROM alternative a JOIN recommendation r ON a.id = r.id_alternative ORDER BY r.rating DESC`, (err, result) => {
       if (err) reject(err.message);
       if (!result) reject({ status: 404, message: "Data not found" });
       resolve(result.rows);
@@ -213,4 +222,5 @@ module.exports = {
   deleteAlternative,
   selectedAlternative,
   getRecommendation,
+  getRank,
 };

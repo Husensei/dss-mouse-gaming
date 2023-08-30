@@ -13,13 +13,15 @@ const getMatrix = async () => {
 const insertMatrix = async (data) => {
   return new Promise(async (resolve, reject) => {
     const queries = [];
-    for (var i = 0; i < data.scale.length; i++) {
+    for (var i = 0; i < data.length; i++) {
       queries.push(
-        `INSERT INTO pairwise_comparison 
-        (id_criteria1, id_criteria2, value) 
-        VALUES ('${data.scale[i].row}', 
-        '${data.scale[i].column}', 
-        ${data.scale[i].value})`
+        // `INSERT INTO pairwise_comparison
+        // (id_criteria1, id_criteria2, value)
+        // VALUES ('${data.scale[i].row}',
+        // '${data.scale[i].column}',
+        // ${data.scale[i].value})`
+        `INSERT INTO pairwise_comparison (id_criteria1, id_criteria2, value) VALUES ('${data[i].row}', '${data[i].column}', 
+        ${data[i].value})`
       );
     }
     try {
